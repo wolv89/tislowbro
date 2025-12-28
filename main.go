@@ -90,10 +90,16 @@ func main() {
 		log.Fatal(err)
 	}
 
-	for _, vid := range videos {
-		fmt.Println("QUEUING:", vid.name)
-		fmt.Println(player.Queue(vid))
-		fmt.Println("")
+	playlist := Playlist{
+		items: videos,
 	}
+
+	playlist.Build()
+	err = playlist.Save()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	player.Queue(playlist)
 
 }

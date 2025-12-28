@@ -67,9 +67,11 @@ func (p Player) Reset() error {
 
 }
 
-func (p Player) Queue(video Video) error {
+func (p Player) Queue(playlist Playlist) error {
 
-	rawPath, _ := exec.Command("wslpath", "-w", video.path).Output()
+	path := workingDir + "tis.xspf"
+
+	rawPath, _ := exec.Command("wslpath", "-w", path).Output()
 	winPath := strings.TrimSpace(string(rawPath))
 
 	uri := "file:///" + winPath
