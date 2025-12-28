@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/url"
 	"os/exec"
+	"strings"
 	"time"
 )
 
@@ -55,21 +56,30 @@ func (p Player) IsRunning() error {
 	return p.apicall(STATUS_PATH)
 }
 
+func (p Player) Reset() error {
+
+	params := url.Values{}
+	params.Add("command", "pl_empty")
+
+	url := fmt.Sprintf("%s?%s", STATUS_PATH, params.Encode())
+
+	return p.apicall(url)
+
+}
+
 func (p Player) Queue(video Video) error {
 
 	rawPath, _ := exec.Command("wslpath", "-w", video.path).Output()
-	winPath := string(rawPath)
-	fmt.Print(winPath)
+	winPath := strings.TrimSpace(string(rawPath))
 
-	uri := "file:" + winPath
+	uri := "file:///" + winPath
 
 	params := url.Values{}
 	params.Add("command", "in_enqueue")
 	params.Add("input", uri)
 
-	fmt.Println("URI:", uri)
-
 	url := fmt.Sprintf("%s?%s", STATUS_PATH, params.Encode())
+	url = strings.ReplaceAll(url, "+", "%20")
 
 	return p.apicall(url)
 

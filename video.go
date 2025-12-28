@@ -27,6 +27,12 @@ func (v *Video) Find() error {
 		return err
 	}
 
+	searchName := v.name
+	n := len(searchName)
+	if searchName[n-3:] == "..." {
+		searchName = searchName[:n-3]
+	}
+
 	var fullName string
 
 	for _, file := range files {
@@ -35,7 +41,7 @@ func (v *Video) Find() error {
 			continue
 		}
 
-		if strings.Index(file.Name(), v.name) == 0 {
+		if strings.Index(file.Name(), searchName) == 0 {
 			fullName = file.Name()
 		}
 

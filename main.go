@@ -50,9 +50,23 @@ func main() {
 		log.Fatal("missing VLC password in env")
 	}
 
+	workingDir = os.Getenv("WORK_DIR")
+
+	if len(workingDir) == 0 {
+		workingDir, err = os.Getwd()
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+
 	player := NewPlayer(vlc_addr, vlc_pass)
 	if err := player.IsRunning(); err != nil {
 		fmt.Println("aborted launch, VLC player does not appear to be running, or is not configured for HTTP connections")
+		log.Fatal(err.Error())
+	}
+
+	if err := player.Reset(); err != nil {
+		fmt.Println("aborted launch, unable to reset VLC play list")
 		log.Fatal(err.Error())
 	}
 
@@ -68,16 +82,7 @@ func main() {
 	}
 	defer f.Close()
 
-	base, err := os.Getwd()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	workingDir = base + "/"
-	if flagMode == MODE_DEVELOPMENT {
-		workingDir = base + "/data/collection/"
-	}
-
+	workingDir += "/"
 	dirCache = make(map[string][]os.DirEntry)
 
 	videos, err := ParseFile(f)
